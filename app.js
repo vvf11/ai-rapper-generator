@@ -10,11 +10,11 @@ const characterDescription = document.getElementById('character-description');
 const downloadBtn = document.getElementById('download-btn');
 const shareBtn = document.getElementById('share-btn');
 
-// Примеры изображений для демонстрации (в реальном приложении здесь был бы API-запрос)
+// Примеры изображений для демонстрации (использую онлайн-URL вместо локальных файлов)
 const sampleImages = [
-    'assets/example1.jpg',
-    'assets/example2.jpg',
-    'assets/example3.jpg'
+    'https://img.freepik.com/free-photo/ai-generated-concept-human_23-2150688409.jpg',
+    'https://img.freepik.com/free-photo/stylish-man-wearing-sunglasses-suit-generated-by-ai_188544-30799.jpg',
+    'https://img.freepik.com/free-photo/cyber-woman-with-neon-lights-her-face-ai-generated-image_268835-6395.jpg'
 ];
 
 // Примеры имен для демонстрации
