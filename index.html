@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Rapper Generator - Fraction AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="assets/logo.png" alt="Fraction AI Logo">
+                <h1>AI Rapper Generator</h1>
+            </div>
+            <p class="subtitle">Создай своего рэп-баттл персонажа для Fraction AI</p>
+        </header>
+
+        <main>
+            <div class="prompt-container">
+                <h2>Введите промпт персонажа</h2>
+                <textarea id="prompt-input" placeholder="Опишите своего рэп-баттл персонажа...например: 'You are an elite rap battle artist with a razor-sharp wit and strategic wordplay...'"></textarea>
+                <div class="buttons">
+                    <button id="clear-btn">Очистить</button>
+                    <button id="generate-btn">Создать образ</button>
+                </div>
+            </div>
+
+            <div class="result-container hidden" id="result-section">
+                <h2>Ваш AI Рэпер</h2>
+                <div class="image-container">
+                    <img id="result-image" src="" alt="Сгенерированный рэпер">
+                    <div class="loading-spinner" id="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Создаем персонажа...</p>
+                    </div>
+                </div>
+                <div class="character-info">
+                    <h3 id="character-name">Имя персонажа</h3>
+                    <p id="character-description">Описание персонажа появится здесь после генерации.</p>
+                </div>
+                <div class="share-buttons">
+                    <button id="download-btn">Скачать изображение</button>
+                    <button id="share-btn">Поделиться</button>
+                </div>
+            </div>
+
+            <div class="how-it-works">
+                <h2>Как это работает?</h2>
+                <ol>
+                    <li>Введите промпт, описывающий вашего идеального AI рэп-баттл персонажа</li>
+                    <li>Нажмите "Создать образ" и дождитесь генерации</li>
+                    <li>Скачайте или поделитесь результатом</li>
+                    <li>Используйте персонажа в баттлах на платформе Fraction AI</li>
+                </ol>
+            </div>
+        </main>
+
+        <div class="examples">
+            <h2>Примеры созданных персонажей</h2>
+            <div class="examples-grid">
+                <div class="example-card">
+                    <img src="assets/example1.jpg" alt="Пример 1">
+                    <h3>TechnoFlow</h3>
+                    <p>Футуристический рэпер с кибернетическими элементами</p>
+                </div>
+                <div class="example-card">
+                    <img src="assets/example2.jpg" alt="Пример 2">
+                    <h3>LyricSmith</h3>
+                    <p>Классический баттл-рэпер со стилем старой школы</p>
+                </div>
+                <div class="example-card">
+                    <img src="assets/example3.jpg" alt="Пример 3">
+                    <h3>QuantumVerse</h3>
+                    <p>Космический рэпер с элементами научной фантастики</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-content">
+                <p>Создано для сообщества Fraction AI</p>
+                <div class="social-links">
+                    <a href="https://twitter.com/FractionAI_xyz" target="_blank">Twitter</a>
+                    <a href="https://github.com/fraction-ai" target="_blank">GitHub</a>
+                    <a href="https://fractionai.xyz/" target="_blank">Официальный сайт</a>
+                </div>
+            </div>
+            <p class="copyright">© 2024 AI Rapper Generator</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html> 
