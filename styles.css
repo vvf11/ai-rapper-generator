@@ -407,4 +407,32 @@ footer {
     .character-info p {
         font-size: 1rem;
     }
+}
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification.success {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.notification.error {
+    background-color: #FF3B30;
+    color: white;
 } 

@@ -31,6 +31,9 @@ const rapperNames = [
     'LogicFlow'
 ];
 
+// Максимальная длина промпта
+const MAX_PROMPT_LENGTH = 500;
+
 // Обработчик события для кнопки очистки
 clearBtn.addEventListener('click', () => {
     promptInput.value = '';
@@ -46,40 +49,79 @@ downloadBtn.addEventListener('click', downloadImage);
 // Обработчик события для кнопки "Поделиться"
 shareBtn.addEventListener('click', shareImage);
 
+// Обработчик события для ввода промпта
+promptInput.addEventListener('input', () => {
+    const length = promptInput.value.length;
+    if (length > MAX_PROMPT_LENGTH) {
+        promptInput.value = promptInput.value.slice(0, MAX_PROMPT_LENGTH);
+        showNotification(`Максимальная длина промпта: ${MAX_PROMPT_LENGTH} символов`, 'error');
+    }
+});
+
+// Обработчик офлайн/онлайн режима
+window.addEventListener('online', () => {
+    showNotification('Подключение восстановлено', 'success');
+    generateBtn.disabled = false;
+});
+
+window.addEventListener('offline', () => {
+    showNotification('Отсутствует подключение к интернету', 'error');
+    generateBtn.disabled = true;
+});
+
 // Функция генерации рэпера
-function generateRapper() {
+async function generateRapper() {
     const prompt = promptInput.value.trim();
     
-    // Проверка на наличие текста в промпте
     if (prompt === '') {
         showNotification('Пожалуйста, введите описание вашего рэп-персонажа', 'error');
         return;
     }
+
+    if (prompt.length > MAX_PROMPT_LENGTH) {
+        showNotification(`Максимальная длина промпта: ${MAX_PROMPT_LENGTH} символов`, 'error');
+        return;
+    }
+
+    if (!navigator.onLine) {
+        showNotification('Отсутствует подключение к интернету', 'error');
+        return;
+    }
     
-    // Показываем индикатор загрузки и секцию результата
-    resultSection.classList.remove('hidden');
-    loadingSpinner.style.display = 'flex';
-    resultImage.style.display = 'none';
-    
-    // Скролл к секции результата
-    resultSection.scrollIntoView({ behavior: 'smooth' });
-    
-    // Имитация задержки API (в реальном приложении здесь был бы запрос к API генерации изображений)
-    setTimeout(() => {
-        // Генерация случайного имени и описания
-        generateCharacterInfo(prompt);
+    try {
+        resultSection.classList.remove('hidden');
+        loadingSpinner.style.display = 'flex';
+        resultImage.style.display = 'none';
         
-        // Выбор случайного изображения из образцов
+        resultSection.scrollIntoView({ behavior: 'smooth' });
+        
+        // Добавляем обработчики для изображения
+        resultImage.onerror = () => {
+            loadingSpinner.style.display = 'none';
+            showNotification('Ошибка загрузки изображения. Попробуйте еще раз.', 'error');
+            // Устанавливаем fallback изображение
+            resultImage.src = 'assets/fallback-image.jpg';
+            resultImage.style.display = 'block';
+        };
+
+        resultImage.onload = () => {
+            loadingSpinner.style.display = 'none';
+            resultImage.style.display = 'block';
+            showNotification('Персонаж успешно создан!', 'success');
+        };
+        
+        // Имитация API запроса
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        generateCharacterInfo(prompt);
         const randomImage = sampleImages[Math.floor(Math.random() * sampleImages.length)];
         resultImage.src = randomImage;
         
-        // Скрываем индикатор загрузки и показываем изображение
+    } catch (error) {
+        console.error('Ошибка при генерации:', error);
+        showNotification('Произошла ошибка при генерации персонажа', 'error');
         loadingSpinner.style.display = 'none';
-        resultImage.style.display = 'block';
-        
-        // Уведомление
-        showNotification('Персонаж успешно создан!', 'success');
-    }, 2000); // 2 секунды для демонстрации
+    }
 }
 
 // Функция для генерации информации о персонаже
@@ -112,20 +154,47 @@ function generateCharacterInfo(prompt) {
 }
 
 // Функция скачивания изображения
-function downloadImage() {
-    // Проверка, что изображение существует
-    if (!resultImage.src || resultImage.style.display === 'none') {
-        showNotification('Изображение еще не сгенерировано', 'error');
-        return;
+async function downloadImage() {
+    try {
+        if (!resultImage.src || resultImage.style.display === 'none') {
+            showNotification('Изображение еще не сгенерировано', 'error');
+            return;
+        }
+
+        // Проверяем валидность URL
+        const url = new URL(resultImage.src);
+        if (!['http:', 'https:'].includes(url.protocol)) {
+            showNotification('Недопустимый URL изображения', 'error');
+            return;
+        }
+
+        // Получаем изображение как Blob
+        const response = await fetch(resultImage.src);
+        if (!response.ok) {
+            throw new Error('Ошибка загрузки изображения');
+        }
+
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        // Создаем безопасное имя файла
+        const safeName = characterName.textContent
+            .replace(/[^a-zA-Zа-яА-Я0-9]/g, '_')
+            .toLowerCase();
+        
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `${safeName}_rapper.jpg`;
+        link.click();
+
+        // Очищаем URL
+        window.URL.revokeObjectURL(blobUrl);
+        
+        showNotification('Скачивание изображения началось', 'success');
+    } catch (error) {
+        console.error('Ошибка при скачивании:', error);
+        showNotification('Ошибка при скачивании изображения', 'error');
     }
-    
-    // Создаем временную ссылку для скачивания
-    const link = document.createElement('a');
-    link.href = resultImage.src;
-    link.download = `${characterName.textContent.replace(/\s+/g, '_')}_rapper.jpg`;
-    link.click();
-    
-    showNotification('Скачивание изображения началось', 'success');
 }
 
 // Функция для поделиться изображением
@@ -156,46 +225,29 @@ function shareImage() {
 
 // Функция для отображения уведомлений
 function showNotification(message, type = 'success') {
-    // Проверяем, существует ли уже элемент уведомления
+    // Используем существующее уведомление или создаем новое
     let notification = document.querySelector('.notification');
     
     if (!notification) {
-        // Создаем элемент уведомления, если он не существует
         notification = document.createElement('div');
         notification.className = 'notification';
         document.body.appendChild(notification);
-        
-        // Добавляем стили для уведомления
-        notification.style.position = 'fixed';
-        notification.style.bottom = '20px';
-        notification.style.right = '20px';
-        notification.style.padding = '15px 25px';
-        notification.style.borderRadius = 'var(--radius)';
-        notification.style.boxShadow = 'var(--shadow)';
-        notification.style.zIndex = '1000';
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateY(20px)';
-        notification.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
     }
     
-    // Устанавливаем цвет в зависимости от типа
-    if (type === 'error') {
-        notification.style.backgroundColor = '#FF3B30';
-        notification.style.color = 'white';
-    } else {
-        notification.style.backgroundColor = 'var(--primary-color)';
-        notification.style.color = 'white';
-    }
+    // Устанавливаем тип уведомления через класс
+    notification.className = `notification ${type}`;
     
-    // Обновляем текст и показываем уведомление
+    // Обновляем текст
     notification.textContent = message;
-    notification.style.opacity = '1';
-    notification.style.transform = 'translateY(0)';
+    
+    // Показываем уведомление
+    requestAnimationFrame(() => {
+        notification.classList.add('show');
+    });
     
     // Скрываем уведомление через 3 секунды
     setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateY(20px)';
+        notification.classList.remove('show');
         
         // Удаляем элемент после завершения анимации
         setTimeout(() => {
